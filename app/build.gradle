@@ -44,27 +44,12 @@ dependencies {
 
 }
 
-sceneform.asset('sampledata/models/cat_face.fbx',
-        'default',
-        'sampledata/models/cat_face.sfa',
-        'src/main/res/raw/cat_face')
-
 sceneform.asset('sampledata/models/fox_face.fbx',
         'sampledata/models/fox_face_material.mat',
         'sampledata/models/fox_face.sfa',
         'src/main/res/raw/fox_face')
 
-sceneform.asset('sampledata/models/cat_eye.fbx',
+sceneform.asset('sampledata/models/cat_sample.fbx',
         'default',
-        'sampledata/models/cat_eye.sfa',
-        'src/main/res/raw/cat_eye')
-
-sceneform.asset('sampledata/models/theet_down.fbx',
-        'default',
-        'sampledata/models/theet_down.sfa',
-        'src/main/res/raw/theet_down')
-
-sceneform.asset('sampledata/models/theet_up.fbx',
-        'default',
-        'sampledata/models/theet_up.sfa',
-        'src/main/res/raw/theet_up')
+        'sampledata/models/cat_sample.sfa',
+        'src/main/res/raw/cat_sample')

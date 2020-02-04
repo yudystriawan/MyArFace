@@ -43,6 +43,7 @@ public class AugmentedFacesActivity extends AppCompatActivity {
     //    private Texture texture;
     private VideoRecorder videoRecorder;
 
+
     private final HashMap<AugmentedFace, AugmentedFaceNode> faceNodeHashMap = new HashMap<>();
 
     private FloatingActionButton recordButton;
@@ -79,7 +80,7 @@ public class AugmentedFacesActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
             ModelRenderable.builder()
-                    .setSource(this, R.raw.cat_face)
+                    .setSource(this, R.raw.cat_sample)
                     .build()
                     .thenAccept(modelRenderable -> {
                         renderable = modelRenderable;
