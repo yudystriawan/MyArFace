@@ -1,5 +1,6 @@
 package com.example.myarface.ar;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -8,6 +9,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.media.CamcorderProfile;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,6 +46,8 @@ public class AugmentedFacesActivity extends AppCompatActivity {
     private static final String TAG = AugmentedFacesActivity.class.getSimpleName();
     private static final double MIN_OPENGL_VERSION = 3.0;
 
+    public static String EXTRA_FILTER = "extra_filter";
+
     private FaceArFragment arFragment;
     private ModelRenderable renderable;
     private VideoRecorder videoRecorder;
@@ -66,6 +70,7 @@ public class AugmentedFacesActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_augmented_face);
 
+
         initUI();
 
         initModelRenderable();
@@ -74,25 +79,6 @@ public class AugmentedFacesActivity extends AppCompatActivity {
 
         initRecycleView();
 
-    }
-
-    private void initRecycleView() {
-        list.addAll(getListFilters());
-        showRecycleList();
-    }
-
-    private void showRecycleList() {
-        rvFilters.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
-        ListFilterAdapter filterAdapter = new ListFilterAdapter(list);
-        rvFilters.setAdapter(filterAdapter);
-    }
-
-    private ArrayList<Filter> getListFilters() {
-        ArrayList<Filter> arrayList = new ArrayList<>();
-        arrayList.add(new Filter(0, "No Filter", null));
-        arrayList.add(new Filter(R.raw.fox_face, "fox_sample", null));
-        arrayList.add(new Filter(R.raw.cat_sample, "cat_sample", null));
-        return arrayList;
     }
 
     private void initUI() {
@@ -111,15 +97,11 @@ public class AugmentedFacesActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
-            ModelRenderable.builder()
-                    .setSource(this, R.raw.cat_sample)
-                    .build()
-                    .thenAccept(modelRenderable -> {
-                        renderable = modelRenderable;
-                        modelRenderable.setShadowCaster(false);
-                        modelRenderable.setShadowReceiver(false);
-                    });
+            int filterResource = getIntent().getIntExtra(EXTRA_FILTER, 0);
 
+            if (filterResource != 0) {
+                loadModelRenderable(this, filterResource);
+            }
 
             ArSceneView arSceneView = arFragment.getArSceneView();
             arSceneView.setCameraStreamRenderPriority(Renderable.RENDER_PRIORITY_FIRST);
@@ -162,6 +144,18 @@ public class AugmentedFacesActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void loadModelRenderable(Context context, int resource) {
+        ModelRenderable.builder()
+                .setSource(context, resource)
+                .build()
+                .thenAccept(modelRenderable -> {
+                    renderable = modelRenderable;
+                    modelRenderable.setShadowCaster(false);
+                    modelRenderable.setShadowReceiver(false);
+                });
     }
 
     private void initVideoRecorder() {
@@ -214,6 +208,42 @@ public class AugmentedFacesActivity extends AppCompatActivity {
             values.put(MediaStore.Video.Media.DATA, videoPath);
             getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
         }
+    }
+
+    private void initRecycleView() {
+        list.addAll(getListFilters());
+        showRecycleList();
+    }
+
+    private void showRecycleList() {
+        rvFilters.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
+        ListFilterAdapter filterAdapter = new ListFilterAdapter(list);
+        rvFilters.setAdapter(filterAdapter);
+
+        filterAdapter.setOnItemClickCallback(new ListFilterAdapter.OnItemClickCallback() {
+            @Override
+            public void onItemClicked(Filter data) {
+                showSelectedFilter(data);
+            }
+        });
+    }
+
+    private void showSelectedFilter(Filter filter) {
+        Toast.makeText(this, "Kamu memilih " + filter.getName(), Toast.LENGTH_SHORT).show();
+
+        getIntent().addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        finish();
+        Intent intent = getIntent().putExtra(EXTRA_FILTER, filter.getResource());
+        startActivity(intent);
+
+    }
+
+    private ArrayList<Filter> getListFilters() {
+        ArrayList<Filter> arrayList = new ArrayList<>();
+        arrayList.add(new Filter(0, "No Filter", null));
+        arrayList.add(new Filter(R.raw.fox_face, "fox_sample", null));
+        arrayList.add(new Filter(R.raw.cat_sample, "cat_sample", null));
+        return arrayList;
     }
 
     private static boolean isDeviceSupported(final Activity activity) {

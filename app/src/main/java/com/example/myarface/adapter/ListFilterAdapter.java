@@ -3,6 +3,7 @@ package com.example.myarface.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,11 +15,19 @@ import com.example.myarface.model.Filter;
 
 import java.util.ArrayList;
 
+import static android.widget.AdapterView.*;
+
 public class ListFilterAdapter extends RecyclerView.Adapter<ListFilterAdapter.ListViewHolder> {
+
     private ArrayList<Filter> filters;
+    private OnItemClickCallback onItemClickCallback;
 
     public ListFilterAdapter(ArrayList<Filter> filters) {
         this.filters = filters;
+    }
+
+    public void setOnItemClickCallback(OnItemClickCallback onItemClickCallback) {
+        this.onItemClickCallback = onItemClickCallback;
     }
 
     @NonNull
@@ -34,6 +43,13 @@ public class ListFilterAdapter extends RecyclerView.Adapter<ListFilterAdapter.Li
 
         holder.tvName.setText(filter.getName());
         holder.imgPhoto.setImageResource(R.color.colorAccent);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemClickCallback.onItemClicked(filters.get(holder.getAdapterPosition()));
+            }
+        });
     }
 
     @Override
@@ -52,4 +68,9 @@ public class ListFilterAdapter extends RecyclerView.Adapter<ListFilterAdapter.Li
             tvName = itemView.findViewById(R.id.tv_item_name);
         }
     }
+
+    public interface OnItemClickCallback {
+        void onItemClicked(Filter data);
+    }
+
 }
