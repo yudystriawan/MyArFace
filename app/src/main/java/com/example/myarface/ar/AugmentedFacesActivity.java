@@ -1,6 +1,8 @@
 package com.example.myarface.ar;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -12,9 +14,12 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.myarface.R;
+import com.example.myarface.adapter.ListFilterAdapter;
+import com.example.myarface.model.Filter;
 import com.example.myarface.record.VideoRecorder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.ar.core.ArCoreApk;
@@ -27,6 +32,7 @@ import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.AugmentedFaceNode;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,13 +46,15 @@ public class AugmentedFacesActivity extends AppCompatActivity {
 
     private FaceArFragment arFragment;
     private ModelRenderable renderable;
-    //    private Texture texture;
     private VideoRecorder videoRecorder;
 
 
     private final HashMap<AugmentedFace, AugmentedFaceNode> faceNodeHashMap = new HashMap<>();
 
-    private FloatingActionButton recordButton;
+    private ImageView imgButtonRecord;
+    private RecyclerView rvFilters;
+
+    private ArrayList<Filter> list = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,13 +72,37 @@ public class AugmentedFacesActivity extends AppCompatActivity {
 
         initVideoRecorder();
 
+        initRecycleView();
+
+    }
+
+    private void initRecycleView() {
+        list.addAll(getListFilters());
+        showRecycleList();
+    }
+
+    private void showRecycleList() {
+        rvFilters.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
+        ListFilterAdapter filterAdapter = new ListFilterAdapter(list);
+        rvFilters.setAdapter(filterAdapter);
+    }
+
+    private ArrayList<Filter> getListFilters() {
+        ArrayList<Filter> arrayList = new ArrayList<>();
+        arrayList.add(new Filter(0, "No Filter", null));
+        arrayList.add(new Filter(R.raw.fox_face, "fox_sample", null));
+        arrayList.add(new Filter(R.raw.cat_sample, "cat_sample", null));
+        return arrayList;
     }
 
     private void initUI() {
-        recordButton = findViewById(R.id.record);
-        recordButton.setOnClickListener(this::toggleRecording);
-        recordButton.setEnabled(true);
-        recordButton.setImageResource(R.drawable.round_videocam);
+        imgButtonRecord = findViewById(R.id.img_button_record);
+        imgButtonRecord.setOnClickListener(this::toggleRecording);
+        imgButtonRecord.setEnabled(true);
+        imgButtonRecord.setImageResource(R.drawable.round_videocam);
+
+        rvFilters = findViewById(R.id.rv_filters);
+        rvFilters.setHasFixedSize(true);
     }
 
     private void initModelRenderable() {
@@ -167,9 +199,9 @@ public class AugmentedFacesActivity extends AppCompatActivity {
         boolean recording = videoRecorder.onToggleRecord();
 
         if (recording) {
-            recordButton.setImageResource(R.drawable.round_stop);
+            imgButtonRecord.setImageResource(R.drawable.round_stop);
         } else {
-            recordButton.setImageResource(R.drawable.round_videocam);
+            imgButtonRecord.setImageResource(R.drawable.round_videocam);
             String videoPath = videoRecorder.getVideoPath().getAbsolutePath();
 
             Toast.makeText(this, "Video saved: " + videoPath, Toast.LENGTH_SHORT).show();
@@ -212,7 +244,7 @@ public class AugmentedFacesActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        if (videoRecorder.isRecording()){
+        if (videoRecorder.isRecording()) {
             toggleRecording(null);
         }
         super.onPause();

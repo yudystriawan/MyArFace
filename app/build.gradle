@@ -42,12 +42,20 @@ dependencies {
     implementation 'com.google.ar.sceneform:core:1.14.0'
     implementation 'com.google.android.material:material:1.0.0'
 
+    implementation 'de.hdodenhof:circleimageview:3.0.0'
+
 }
 
 sceneform.asset('sampledata/models/fox_face.fbx',
         'sampledata/models/fox_face_material.mat',
         'sampledata/models/fox_face.sfa',
         'src/main/res/raw/fox_face')
+
+
+sceneform.asset('sampledata/models/canonical_face_mesh.fbx',
+        'default',
+        'sampledata/models/canonical_face_mesh.sfa',
+        'src/main/res/raw/canonical_face_mesh')
 
 sceneform.asset('sampledata/models/cat_sample.fbx',
         'default',
