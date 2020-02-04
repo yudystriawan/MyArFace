@@ -1,17 +1,22 @@
 package com.example.myarface.ar;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.ContentValues;
 import android.content.Context;
+import android.media.CamcorderProfile;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.myarface.R;
+import com.example.myarface.record.VideoRecorder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.AugmentedFace;
 import com.google.ar.core.TrackingState;
@@ -20,7 +25,6 @@ import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
-import com.google.ar.sceneform.rendering.Texture;
 import com.google.ar.sceneform.ux.AugmentedFaceNode;
 
 import java.util.Collection;
@@ -36,9 +40,12 @@ public class AugmentedFacesActivity extends AppCompatActivity {
 
     private FaceArFragment arFragment;
     private ModelRenderable renderable;
-//    private Texture texture;
+    //    private Texture texture;
+    private VideoRecorder videoRecorder;
 
     private final HashMap<AugmentedFace, AugmentedFaceNode> faceNodeHashMap = new HashMap<>();
+
+    private FloatingActionButton recordButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +57,22 @@ public class AugmentedFacesActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_augmented_face);
 
-        init();
+        initUI();
+
+        initModelRenderable();
+
+        initVideoRecorder();
 
     }
 
-    private void init() {
+    private void initUI() {
+        recordButton = findViewById(R.id.record);
+        recordButton.setOnClickListener(this::toggleRecording);
+        recordButton.setEnabled(true);
+        recordButton.setImageResource(R.drawable.round_videocam);
+    }
+
+    private void initModelRenderable() {
 
         arFragment = (FaceArFragment) getSupportFragmentManager().findFragmentById(R.id.face_fragment);
 
@@ -93,11 +111,11 @@ public class AugmentedFacesActivity extends AppCompatActivity {
                         }
 
                         Iterator<Map.Entry<AugmentedFace, AugmentedFaceNode>> iterator = faceNodeHashMap.entrySet().iterator();
-                        while (iterator.hasNext()){
+                        while (iterator.hasNext()) {
                             Map.Entry<AugmentedFace, AugmentedFaceNode> entry = iterator.next();
                             AugmentedFace face = entry.getKey();
 
-                            if (face.getTrackingState()== TrackingState.STOPPED){
+                            if (face.getTrackingState() == TrackingState.STOPPED) {
                                 AugmentedFaceNode faceNode = entry.getValue();
                                 faceNode.setParent(null);
                                 iterator.remove();
@@ -106,11 +124,63 @@ public class AugmentedFacesActivity extends AppCompatActivity {
 
                     }
             );
-        }else{
+        } else {
             Toast.makeText(this, "This Device is not supported", Toast.LENGTH_LONG).show();
         }
 
 
+    }
+
+    private void initVideoRecorder() {
+        int orientation = getResources().getConfiguration().orientation;
+
+        videoRecorder = new VideoRecorder();
+        videoRecorder.setVideoQuality(CamcorderProfile.QUALITY_2160P, orientation);
+        videoRecorder.setSceneView(arFragment.getArSceneView());
+
+    }
+
+    private void toggleRecording(View unusedView) {
+        if (!arFragment.hasWritePermission()) {
+            Log.e(TAG, "Video recording requires the WRITE_EXTERNAL_STORAGE permission");
+            Toast.makeText(
+                    this,
+                    "Video recording requires the WRITE_EXTERNAL_STORAGE permission",
+                    Toast.LENGTH_LONG)
+                    .show();
+            arFragment.launchPermissionSettings();
+            return;
+        }
+
+        if (!arFragment.hasRecordAudioPermission()) {
+            Log.e(TAG, "Video recording requires the RECORD_AUDIO permission");
+            Toast.makeText(
+                    this,
+                    "Video recording requires the RECORD_AUDIO permission",
+                    Toast.LENGTH_LONG)
+                    .show();
+            arFragment.launchPermissionSettings();
+            return;
+        }
+
+        boolean recording = videoRecorder.onToggleRecord();
+
+        if (recording) {
+            recordButton.setImageResource(R.drawable.round_stop);
+        } else {
+            recordButton.setImageResource(R.drawable.round_videocam);
+            String videoPath = videoRecorder.getVideoPath().getAbsolutePath();
+
+            Toast.makeText(this, "Video saved: " + videoPath, Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Video saved: " + videoPath);
+
+            // Send  notification of updated content.
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Video.Media.TITLE, "Sceneform Video");
+            values.put(MediaStore.Video.Media.MIME_TYPE, "video/mp4");
+            values.put(MediaStore.Video.Media.DATA, videoPath);
+            getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
+        }
     }
 
     private static boolean isDeviceSupported(final Activity activity) {
@@ -139,4 +209,11 @@ public class AugmentedFacesActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onPause() {
+        if (videoRecorder.isRecording()){
+            toggleRecording(null);
+        }
+        super.onPause();
+    }
 }
