@@ -79,7 +79,7 @@ public class AugmentedFacesActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
             ModelRenderable.builder()
-                    .setSource(this, R.raw.fox_face)
+                    .setSource(this, R.raw.cat_face)
                     .build()
                     .thenAccept(modelRenderable -> {
                         renderable = modelRenderable;
