@@ -1,10 +1,5 @@
 package com.example.myarface.ar;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ContentValues;
@@ -19,11 +14,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.myarface.R;
 import com.example.myarface.adapter.ListFilterAdapter;
 import com.example.myarface.model.Filter;
 import com.example.myarface.record.VideoRecorder;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.AugmentedFace;
 import com.google.ar.core.TrackingState;
@@ -234,7 +233,9 @@ public class AugmentedFacesActivity extends AppCompatActivity {
         getIntent().addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         finish();
         Intent intent = getIntent().putExtra(EXTRA_FILTER, filter.getResource());
+        overridePendingTransition(0, 0);
         startActivity(intent);
+        overridePendingTransition(0, 0);
 
     }
 
