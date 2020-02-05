@@ -16,11 +16,13 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myarface.R;
 import com.example.myarface.adapter.ListFilterAdapter;
+import com.example.myarface.config.ExpandOrCollapse;
 import com.example.myarface.model.Filter;
 import com.example.myarface.record.VideoRecorder;
 import com.google.ar.core.ArCoreApk;
@@ -55,7 +57,15 @@ public class AugmentedFacesActivity extends AppCompatActivity {
     private final HashMap<AugmentedFace, AugmentedFaceNode> faceNodeHashMap = new HashMap<>();
 
     private ImageView imgButtonRecord;
+    private ImageView imgButtonFilter;
     private RecyclerView rvFilters;
+    private ConstraintLayout layoutFilters;
+
+//    private ExpandableRelativeLayout layoutFilters;
+
+    private ExpandOrCollapse expandOrCollapseManager;
+
+    private boolean isLayoutFilterExpanded = false;
 
     private ArrayList<Filter> list = new ArrayList<>();
 
@@ -67,8 +77,9 @@ public class AugmentedFacesActivity extends AppCompatActivity {
             return;
         }
 
-        setContentView(R.layout.activity_augmented_face);
+        expandOrCollapseManager = new ExpandOrCollapse();
 
+        setContentView(R.layout.activity_augmented_face);
 
         initUI();
 
@@ -85,6 +96,12 @@ public class AugmentedFacesActivity extends AppCompatActivity {
         imgButtonRecord.setOnClickListener(this::toggleRecording);
         imgButtonRecord.setEnabled(true);
         imgButtonRecord.setImageResource(R.drawable.round_videocam);
+
+        imgButtonFilter = findViewById(R.id.img_button_filter);
+        imgButtonFilter.setOnClickListener(this::toggleLayoutFilter);
+        imgButtonFilter.setEnabled(true);
+
+        layoutFilters = findViewById(R.id.layout_filters);
 
         rvFilters = findViewById(R.id.rv_filters);
         rvFilters.setHasFixedSize(true);
@@ -209,6 +226,16 @@ public class AugmentedFacesActivity extends AppCompatActivity {
         }
     }
 
+    private void toggleLayoutFilter(View unusedView) {
+        if (layoutFilters.getVisibility() == View.VISIBLE) {
+            layoutFilters.setVisibility(View.GONE);
+            isLayoutFilterExpanded = false;
+        } else {
+            layoutFilters.setVisibility(View.VISIBLE);
+            isLayoutFilterExpanded = true;
+        }
+    }
+
     private void initRecycleView() {
         list.addAll(getListFilters());
         showRecycleList();
@@ -242,9 +269,12 @@ public class AugmentedFacesActivity extends AppCompatActivity {
     private ArrayList<Filter> getListFilters() {
         ArrayList<Filter> arrayList = new ArrayList<>();
         arrayList.add(new Filter(0, "No Filter", null));
-        arrayList.add(new Filter(R.raw.fox_face, "fox_sample", null));
-        arrayList.add(new Filter(R.raw.cat_sample, "cat_sample", null));
-        arrayList.add(new Filter(R.raw.topi_1, "topi_sample", null));
+        arrayList.add(new Filter(R.raw.eyeglass2, "eyeglass", null));
+        arrayList.add(new Filter(R.raw.red_nose, "red_nose", null));
+        arrayList.add(new Filter(R.raw.gatto, "gatto", null));
+//        arrayList.add(new Filter(R.raw.fox_face, "fox_sample", null));
+//        arrayList.add(new Filter(R.raw.horn_left, "horn_left", null));
+//        arrayList.add(new Filter(R.raw.hair, "hair_sample", null));
         return arrayList;
     }
 

@@ -44,26 +44,25 @@ dependencies {
 
     implementation 'de.hdodenhof:circleimageview:3.0.0'
 
+    //expandable Layout
+    implementation 'com.github.aakira:expandable-layout:1.6.0@aar'
+
 }
 
-sceneform.asset('sampledata/models/fox_face.fbx',
-        'sampledata/models/fox_face_material.mat',
-        'sampledata/models/fox_face.sfa',
-        'src/main/res/raw/fox_face')
 
-
-sceneform.asset('sampledata/models/canonical_face_mesh.fbx',
+sceneform.asset('sampledata/models/red_nose.fbx',
         'default',
-        'sampledata/models/canonical_face_mesh.sfa',
-        'src/main/res/raw/canonical_face_mesh')
+        'sampledata/models/red_nose.sfa',
+        'src/main/res/raw/red_nose')
 
-
-sceneform.asset('sampledata/models/topi_1.fbx',
+sceneform.asset('sampledata/models/eyeglass2.fbx',
         'default',
-        'sampledata/models/topi_1.sfa',
-        'src/main/res/raw/topi_1')
+        'sampledata/models/eyeglass2.sfa',
+        'src/main/res/raw/eyeglass2')
 
-sceneform.asset('sampledata/models/cat_sample.fbx',
+
+
+sceneform.asset('sampledata/models/gatto.fbx',
         'default',
-        'sampledata/models/cat_sample.sfa',
-        'src/main/res/raw/cat_sample')
+        'sampledata/models/gatto.sfa',
+        'src/main/res/raw/gatto')
