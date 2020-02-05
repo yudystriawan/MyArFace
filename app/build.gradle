@@ -57,6 +57,12 @@ sceneform.asset('sampledata/models/canonical_face_mesh.fbx',
         'sampledata/models/canonical_face_mesh.sfa',
         'src/main/res/raw/canonical_face_mesh')
 
+
+sceneform.asset('sampledata/models/topi_1.fbx',
+        'default',
+        'sampledata/models/topi_1.sfa',
+        'src/main/res/raw/topi_1')
+
 sceneform.asset('sampledata/models/cat_sample.fbx',
         'default',
         'sampledata/models/cat_sample.sfa',

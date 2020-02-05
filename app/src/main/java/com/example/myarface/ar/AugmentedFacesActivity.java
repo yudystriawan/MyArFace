@@ -244,6 +244,7 @@ public class AugmentedFacesActivity extends AppCompatActivity {
         arrayList.add(new Filter(0, "No Filter", null));
         arrayList.add(new Filter(R.raw.fox_face, "fox_sample", null));
         arrayList.add(new Filter(R.raw.cat_sample, "cat_sample", null));
+        arrayList.add(new Filter(R.raw.topi_1, "topi_sample", null));
         return arrayList;
     }
 
