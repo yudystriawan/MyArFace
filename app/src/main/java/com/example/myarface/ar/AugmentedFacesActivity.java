@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -22,14 +23,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myarface.R;
 import com.example.myarface.adapter.ListFilterAdapter;
-import com.example.myarface.config.ExpandOrCollapse;
 import com.example.myarface.model.Filter;
 import com.example.myarface.record.VideoRecorder;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.AugmentedFace;
 import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.ArSceneView;
-import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
@@ -53,17 +52,18 @@ public class AugmentedFacesActivity extends AppCompatActivity {
     private ModelRenderable renderable;
     private VideoRecorder videoRecorder;
 
-
     private final HashMap<AugmentedFace, AugmentedFaceNode> faceNodeHashMap = new HashMap<>();
 
     private ImageView imgButtonRecord;
     private ImageView imgButtonFilter;
+    private ImageView testing;
     private RecyclerView rvFilters;
     private ConstraintLayout layoutFilters;
 
-//    private ExpandableRelativeLayout layoutFilters;
+    private float dX, dY;
+    private int lastAction;
 
-    private ExpandOrCollapse expandOrCollapseManager;
+//    private ExpandableRelativeLayout layoutFilters;
 
     private boolean isLayoutFilterExpanded = false;
 
@@ -77,8 +77,6 @@ public class AugmentedFacesActivity extends AppCompatActivity {
             return;
         }
 
-        expandOrCollapseManager = new ExpandOrCollapse();
-
         setContentView(R.layout.activity_augmented_face);
 
         initUI();
@@ -88,6 +86,7 @@ public class AugmentedFacesActivity extends AppCompatActivity {
         initVideoRecorder();
 
         initRecycleView();
+
 
     }
 
@@ -121,40 +120,65 @@ public class AugmentedFacesActivity extends AppCompatActivity {
 
             ArSceneView arSceneView = arFragment.getArSceneView();
             arSceneView.setCameraStreamRenderPriority(Renderable.RENDER_PRIORITY_FIRST);
+            arSceneView.setMinimumWidth(900);
+            arSceneView.setMinimumHeight(900);
 
             Scene scene = arSceneView.getScene();
-            scene.addOnUpdateListener(
-                    (FrameTime frametime) -> {
-                        if (renderable == null) {
-                            return;
-                        }
+            scene.addOnUpdateListener(frameTime -> {
+                if (renderable == null) {
+                    return;
+                }
 
-                        Collection<AugmentedFace> faces =
-                                arSceneView.getSession().getAllTrackables(AugmentedFace.class);
+                Collection<AugmentedFace> faces =
+                        arSceneView.getSession().getAllTrackables(AugmentedFace.class);
 
-                        for (AugmentedFace face : faces) {
-                            if (!faceNodeHashMap.containsKey(face)) {
-                                AugmentedFaceNode faceNode = new AugmentedFaceNode(face);
-                                faceNode.setParent(scene);
-                                faceNode.setFaceRegionsRenderable(renderable);
-                                faceNodeHashMap.put(face, faceNode);
-                            }
-                        }
-
-                        Iterator<Map.Entry<AugmentedFace, AugmentedFaceNode>> iterator = faceNodeHashMap.entrySet().iterator();
-                        while (iterator.hasNext()) {
-                            Map.Entry<AugmentedFace, AugmentedFaceNode> entry = iterator.next();
-                            AugmentedFace face = entry.getKey();
-
-                            if (face.getTrackingState() == TrackingState.STOPPED) {
-                                AugmentedFaceNode faceNode = entry.getValue();
-                                faceNode.setParent(null);
-                                iterator.remove();
-                            }
-                        }
-
+                for (AugmentedFace face : faces) {
+                    if (!faceNodeHashMap.containsKey(face)) {
+                        AugmentedFaceNode faceNode = new AugmentedFaceNode(face);
+                        faceNode.setParent(scene);
+                        faceNode.setFaceRegionsRenderable(renderable);
+                        faceNodeHashMap.put(face, faceNode);
                     }
-            );
+                }
+
+                Iterator<Map.Entry<AugmentedFace, AugmentedFaceNode>> iterator = faceNodeHashMap.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<AugmentedFace, AugmentedFaceNode> entry = iterator.next();
+                    AugmentedFace face = entry.getKey();
+
+                    if (face.getTrackingState() == TrackingState.STOPPED) {
+                        AugmentedFaceNode faceNode = entry.getValue();
+                        faceNode.setParent(null);
+                        iterator.remove();
+                    }
+                }
+            });
+
+            scene.setOnTouchListener((hitTestResult, motionEvent) -> {
+                Log.d(TAG, "onTouch: entering...");
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        Log.d(TAG, "ACTION_DOWN triggered");
+                        dX = arSceneView.getX() - motionEvent.getRawX();
+                        dY = arSceneView.getY() - motionEvent.getRawY();
+                        lastAction = MotionEvent.ACTION_DOWN;
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        Log.d(TAG, "ACTION_MOVE triggered");
+                        arSceneView.setX(motionEvent.getRawX() + dX);
+                        arSceneView.setY(motionEvent.getRawY() + dY);
+                        lastAction = MotionEvent.ACTION_MOVE;
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        Log.d(TAG, "ACTION_UP triggered");
+                        if (lastAction == MotionEvent.ACTION_DOWN) {
+                            Toast.makeText(AugmentedFacesActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                }
+                return true;
+            });
+
         } else {
             Toast.makeText(this, "This Device is not supported", Toast.LENGTH_LONG).show();
         }
@@ -311,4 +335,5 @@ public class AugmentedFacesActivity extends AppCompatActivity {
         }
         super.onPause();
     }
+
 }

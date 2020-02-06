@@ -32,6 +32,7 @@ public class FaceArFragment extends ArFragment {
     protected Config getSessionConfiguration(Session session) {
         Config config = new Config(session);
         config.setAugmentedFaceMode(Config.AugmentedFaceMode.MESH3D);
+        ;
         return config;
     }
 

@@ -33,6 +33,8 @@ public class VideoRecorder {
     private File videoPath;
     private Surface encoderSurface;
 
+    private int width, height;
+
     private int bitRate = DEFAULT_BITRATE;
     private int frameRate = DEFAULT_FRAMERATE;
 
@@ -82,6 +84,13 @@ public class VideoRecorder {
         return recordingVideoFlag;
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
 
     public void setVideoQuality(int quality, int orientation) {
         CamcorderProfile profile = null;
@@ -106,6 +115,9 @@ public class VideoRecorder {
         } else {
             setVideoSize(profile.videoFrameHeight, profile.videoFrameWidth);
         }
+
+        this.width = profile.videoFrameWidth;
+        this.height = profile.videoFrameHeight;
 
         setVideoCodec(profile.videoCodec);
         setAudioCodec(profile.audioCodec);

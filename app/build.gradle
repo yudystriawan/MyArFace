@@ -60,8 +60,6 @@ sceneform.asset('sampledata/models/eyeglass2.fbx',
         'sampledata/models/eyeglass2.sfa',
         'src/main/res/raw/eyeglass2')
 
-
-
 sceneform.asset('sampledata/models/gatto.fbx',
         'default',
         'sampledata/models/gatto.sfa',
