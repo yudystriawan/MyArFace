@@ -293,9 +293,9 @@ public class AugmentedFacesActivity extends AppCompatActivity {
     private ArrayList<Filter> getListFilters() {
         ArrayList<Filter> arrayList = new ArrayList<>();
         arrayList.add(new Filter(0, "No Filter", null));
-        arrayList.add(new Filter(R.raw.eyeglass2, "eyeglass", null));
-        arrayList.add(new Filter(R.raw.red_nose, "red_nose", null));
-        arrayList.add(new Filter(R.raw.gatto, "gatto", null));
+//        arrayList.add(new Filter(R.raw.eyeglass2, "eyeglass", null));
+//        arrayList.add(new Filter(R.raw.red_nose, "red_nose", null));
+//        arrayList.add(new Filter(R.raw.gatto, "gatto", null));
 //        arrayList.add(new Filter(R.raw.fox_face, "fox_sample", null));
 //        arrayList.add(new Filter(R.raw.horn_left, "horn_left", null));
 //        arrayList.add(new Filter(R.raw.hair, "hair_sample", null));
