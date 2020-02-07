@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -108,7 +109,16 @@ public class AugmentedFacesActivity extends AppCompatActivity {
 
     private void initModelRenderable() {
 
+//        ind height = getHeightBaseOnWidthScreen()
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width = displayMetrics.widthPixels;
+        int height = (int) (width * 1.3);
+
         arFragment = (FaceArFragment) getSupportFragmentManager().findFragmentById(R.id.face_fragment);
+        ViewGroup.LayoutParams layoutParams = arFragment.getView().getLayoutParams();
+        layoutParams.height = height;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
@@ -293,12 +303,8 @@ public class AugmentedFacesActivity extends AppCompatActivity {
     private ArrayList<Filter> getListFilters() {
         ArrayList<Filter> arrayList = new ArrayList<>();
         arrayList.add(new Filter(0, "No Filter", null));
-//        arrayList.add(new Filter(R.raw.eyeglass2, "eyeglass", null));
-//        arrayList.add(new Filter(R.raw.red_nose, "red_nose", null));
-//        arrayList.add(new Filter(R.raw.gatto, "gatto", null));
-//        arrayList.add(new Filter(R.raw.fox_face, "fox_sample", null));
-//        arrayList.add(new Filter(R.raw.horn_left, "horn_left", null));
-//        arrayList.add(new Filter(R.raw.hair, "hair_sample", null));
+        arrayList.add(new Filter(R.raw.red_nose, "red_nose", null));
+        arrayList.add(new Filter(R.raw.gatto, "gatto", null));
         return arrayList;
     }
 
